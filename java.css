@@ -183,11 +183,14 @@ footer{
 
 
 @media (max-width: 480px) {
-
-    .card-box {
+  .card-box {
         grid-template-columns: 1fr;
     }
-
+        body {
+        margin: 0 auto;  
+        width: 100%;
+        padding-bottom: 70px;
+    }
     .Login-mobile {
        display: block;
        background-color: rgb(180, 31, 31);
@@ -195,30 +198,43 @@ footer{
        border: none;
        color:white;
        padding: 10px 15px;
-      
+       margin-bottom: 20px;
        transition: opacity 0s;
     }
-    .heading .topics{
+  .heading {
+        margin-left: 0;     
+        padding: 0 10px;      
+    }
+  
+      .heading .topics {
+        width: 50%;         
         font-size: 18px;
-        height: 50px;
-        padding-bottom:20px;
+        height: 10vh;
+        padding-bottom: 40px;
+    }
+        .list_of_topics li {
+        width: 100%;          
+    }
+
+    .cards-section {
+        grid-template-columns: 1fr; 
+        justify-items: center;      
     }
     footer p{
         font-size: 10px;
     }
  
-    .cards{
-        margin: 0 auto;
-        margin-left: 120px;
+     .cards {
+        margin: 0 auto;   
+    }
+        .buttons {
+        margin-left: 0;
+        margin-right: 0;
+        text-align: center;   
     }
 
-   .buttons{
-    margin-right: 40px;
-    
-   }
-   button{
-    margin-top: 20px;
-   }
+ 
+  
 
     nav{
         display:none;
@@ -253,5 +269,6 @@ footer{
 
     body{
         padding-bottom:70px;
+        width: 100%;
     }
 }
