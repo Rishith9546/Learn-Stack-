@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LearnStack</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="favicon.ico">
+</head>
+<body>
+    <header class=" reveal delay-0">
+        <h3>LearnStack</h3>
+     
+        <nav id="navMenu">
+            <ul>
+                <li><a href="#hero">Home</a></li>
+                <li><a href="#courses">Courses</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li><a href="#about">About</a></li>
+
+             <li class="login"><a href="#" onclick="openLogin()">Login</a></li>
+            </ul>
+         
+        </nav>
+        <button class="Login-mobile"  onclick="openLogin()">Login</button>
+    </header>
+    <section id="hero">
+        <div class="left-side">
+            <div class="part1">
+          <h1 class="reveal delay-2">Learn Programming the Smart Way</h1>
+          <p class="reveal delay-3">Master DSA, Java, and Web Development with beginner-friendly courses. </p>
+          </div>
+          <div class=" part2 reveal delay-4">
+         <a href="#courses" class="btn">Explore Courses</a>
+          </div>
+        </div>
+        <div>
+          <figure class="reveal delay-3">
+            <img src="https://media.istockphoto.com/id/2233679886/photo/young-programmer-analyzing-code-on-laptop-and-large-screen-in-modern-office.webp?a=1&b=1&s=612x612&w=0&k=20&c=jqJvXU0lDyVsal-0BnE8MlDVP4aOSUpt0qzxR-RJzbM=" alt="Coding Image">
+          </figure>
+        </div>
+    </section>
+    <div class="border"></div>
+    <section id="courses">
+        <div class="card-box">
+<div class="card reveal1">
+    <img src="https://i.pinimg.com/originals/c7/fc/02/c7fc020567f7bd15c1ac7dda928dda52.jpg" alt="DSA" width="180">
+    <div class="second">
+    <h3>DSA Masterclass</h3>
+
+    <p>Learn Data Structures and Algorithms step by step.</p>
+
+    <p class="instructor">-By Shiva mani</p>
+
+    <p class="rating">⭐⭐⭐⭐☆</p>
+
+    <button onclick="window.location.href='dsa.html'">View Course</button>
+    </div>
+</div>
+<div class="card reveal1">
+    <img src="https://t4.ftcdn.net/jpg/04/42/21/91/360_F_442219135_kbXNuz82DCCxgEOt2GGAxyo2EvNCA7Q3.jpg" alt="Java Programming" width="145">
+    <div class="second">
+    <h3>Java Programming</h3>
+
+    <p>Description: Master Java from basics to advanced concepts.</p>
+
+    <p class="instructor">-By Sai Lokesh</p>
+
+    <p class="rating">⭐⭐⭐⭐⭐</p>
+
+    <button  onclick="window.location.href='java.html'">View Course</button>
+    </div>
+</div>
+<div class="card reveal1">
+    <img src="https://i.pinimg.com/originals/51/b2/fe/51b2fee7367115957f29cb0add059017.jpg" alt="web developnment" width="180">
+    <div class="second">
+    <h3>Web Development</h3>
+
+    <p>Learn HTML, CSS, and JavaScript to build modern websites.</p>
+
+    <p class="instructor">-By Rishith</p>
+
+    <p class="rating">⭐⭐⭐⭐☆</p>
+
+    <button>View Course</button>
+  
+    </div>
+</div>
+
+        </div>
+        </div>
+    </section>
+
+
+    <section id="contact">
+        <fieldset>
+        <legend>Contact us</legend>
+                <label for="name">Name: <br><input type="text" placeholder="Name" id="name" name="name"></label>
+                <label for="email">Email:<br></Email:br> <input type="text"placeholder="var@gmail.com"></label>
+                <label for="message">Message:<br>
+                    <textarea name="message" id="message" placeholder="write something here......" cols="20" rows="10"></textarea>
+                </label>
+                <div class="btn">
+                <button type="submit">Send Message</button>
+                </div>
+                <div class="inf">
+                <p>📧 Email: rishith@gmail.com</p>
+                <p>📞 Phone: +91 9705430043</p>
+                <p>📍 Location: India</p>
+                </div>
+        </fieldset>
+
+
+    </section>
+    
+    <div id="loginPopup" class="login-popup">
+    <div class="login-card">
+     
+        <h2>Login</h2>
+        <span class="close" onclick="closeLogin()">X</span>
+         
+        <input type="text" placeholder="Email">
+        <input type="password" placeholder="Password">
+
+        <button>Login</button>
+       
+    </div>
+</div>
+<section id="about">
+<h2>About Us</h2>
+
+<p>
+Our platform is designed to help students learn programming and computer science
+in a simple, structured, and practical way. We provide carefully designed courses
+on important topics such as Data Structures and Algorithms, Java Programming,
+Web Development, Python, and Database Management. Each course focuses on clear
+explanations and step-by-step learning so that students can easily understand
+even complex programming concepts.
+</p>
+
+<p>
+We believe that learning programming should be accessible to everyone. Many
+students struggle with coding because concepts are often explained in a very
+complicated way. Our goal is to simplify learning by breaking down difficult
+topics into smaller and easy-to-understand lessons. Through structured modules,
+practice problems, and examples, students can gradually build strong programming
+skills and confidence.
+</p>
+
+<p>
+Our platform is suitable for beginners who are starting their coding journey,
+as well as students who want to strengthen their technical knowledge. We focus
+not only on theory but also on practical learning. By working on real coding
+examples and mini projects, learners gain hands-on experience that helps them
+understand how programming is used in real-world applications.
+</p>
+
+<p>
+Another important goal of our platform is to help students improve their
+problem-solving abilities. Programming is not just about writing code; it is
+about understanding problems and finding efficient solutions. Our courses
+include coding exercises and logical challenges that help students develop
+strong analytical thinking skills.
+</p>
+
+<p>
+We also aim to support students who are preparing for technical interviews
+and careers in the technology industry. Many companies expect candidates
+to have strong knowledge of Data Structures, Algorithms, and core programming
+concepts. Our structured courses help students build the skills needed to
+perform well in coding interviews and software development roles.
+</p>
+
+<p>
+Our mission is to create a learning environment where students can grow,
+explore new technologies, and build the confidence needed to become
+successful developers. By providing high-quality educational content,
+practical examples, and real-world projects, we help learners take the
+next step in their programming journey.
+</p>
+
+</section>
+<footer>
+    <p>© 2026 LearnStack. All Rights Reserved.</p>
+</footer>
+<script src="script.js"></script>
+</body>
+</html>
