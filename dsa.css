@@ -116,7 +116,7 @@ header nav ul a:active{
 .buttons{
   margin:20px 10px;
   margin-left: 100px;
- 
+  
   text-align: center;
 }
 button{
@@ -128,6 +128,7 @@ button{
     font-family: inherit;
     opacity: 1;
     transition: opacity 0s;
+   
 }
 button:hover{
     opacity: 0.5;
@@ -192,6 +193,9 @@ footer{
 
    .buttons{
     margin-right: 40px;
+   }
+   button{
+    margin-top: 20px;
    }
 
     nav{
