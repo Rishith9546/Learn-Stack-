@@ -1,0 +1,65 @@
+body{
+margin:0;
+font-family:Arial;
+background:#0d0d0d;
+color:white;
+}
+
+/* TOP BAR */
+.topbar{
+display:flex;
+justify-content:space-between;
+padding:15px;
+background:#111;
+}
+
+/* LAYOUT */
+.layout{
+display:flex;
+}
+
+/* SIDEBAR (25%) */
+.sidebar{
+width:25%;
+background:#1a1a1a;
+padding:20px;
+height:100vh;
+position:sticky;
+top:0;
+overflow-y:auto;
+}
+
+.sidebar ul{
+list-style:none;
+padding:0;
+}
+
+.sidebar li{
+margin:10px 0;
+}
+
+.sidebar a{
+color:white;
+text-decoration:none;
+}
+
+/* CONTENT (75%) */
+.content{
+width:75%;
+padding:30px;
+}
+
+section{
+margin-bottom:60px;
+}
+
+h1{
+color:#00d4ff;
+}
+
+pre{
+background:#111;
+padding:15px;
+border-radius:10px;
+overflow-x:auto;
+}
