@@ -1,0 +1,1703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LearnStack – Courses</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --sidebar-bg: #0f0f16;
+    --border: #1e1e2e;
+    --accent: #00d4ff;
+    --accent2: #ff6b35;
+    --accent3: #7c3aed;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --code-bg: #0d1117;
+    --tab-active: #00d4ff;
+    --sidebar-w: 260px;
+    --topbar-h: 56px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: var(--topbar-h);
+    background: rgba(10,10,15,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    z-index: 1000;
+  }
+
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .logo {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+    text-decoration: none;
+  }
+
+  .course-tabs {
+    display: flex;
+    gap: 4px;
+  }
+
+  .tab-btn {
+    padding: 7px 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    transition: all 0.2s;
+  }
+
+  .tab-btn:hover {
+    color: var(--text);
+    border-color: #333;
+  }
+
+  .tab-btn.active {
+    background: var(--accent);
+    color: #000;
+    border-color: var(--accent);
+  }
+
+  .tab-btn[data-course="java"].active {
+    background: var(--accent2);
+    border-color: var(--accent2);
+  }
+
+  .tab-btn[data-course="web"].active {
+    background: var(--accent3);
+    border-color: var(--accent3);
+  }
+
+  .home-link {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .home-link:hover { color: var(--text); }
+
+  /* ── LAYOUT ── */
+  .layout {
+    display: flex;
+    padding-top: var(--topbar-h);
+    min-height: 100vh;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--border);
+    position: fixed;
+    top: var(--topbar-h);
+    left: 0;
+    height: calc(100vh - var(--topbar-h));
+    overflow-y: auto;
+    padding: 20px 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .sidebar-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0 20px 10px;
+    display: none;
+  }
+
+  .sidebar-title.active { display: block; }
+
+  .sidebar-nav { list-style: none; }
+
+  .sidebar-nav li a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 20px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    border-left: 2px solid transparent;
+    transition: all 0.15s;
+    cursor: pointer;
+  }
+
+  .sidebar-nav li a:hover {
+    color: var(--text);
+    background: rgba(255,255,255,0.03);
+    border-left-color: var(--border);
+  }
+
+  .sidebar-nav li a.current {
+    color: var(--accent);
+    border-left-color: var(--accent);
+    background: rgba(0,212,255,0.05);
+  }
+
+  .sidebar-nav[data-for="java"] li a.current { color: var(--accent2); border-left-color: var(--accent2); background: rgba(255,107,53,0.05); }
+  .sidebar-nav[data-for="web"] li a.current { color: var(--accent3); border-left-color: var(--accent3); background: rgba(124,58,237,0.05); }
+
+  .sidebar-nav .icon { font-size: 14px; width: 18px; text-align: center; }
+
+  /* ── CONTENT ── */
+  .content-area {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    padding: 48px 60px;
+    max-width: 960px;
+  }
+
+  /* Course panels */
+  .course-panel { display: none; }
+  .course-panel.active { display: block; }
+
+  /* Sections */
+  .doc-section {
+    margin-bottom: 72px;
+    scroll-margin-top: 80px;
+  }
+
+  .doc-section h1 {
+    font-size: 30px;
+    font-weight: 800;
+    margin-bottom: 16px;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .course-panel[data-course="java"] .doc-section h1 { color: var(--accent2); }
+  .course-panel[data-course="web"] .doc-section h1 { color: var(--accent3); }
+
+  .doc-section h2 {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 28px 0 10px;
+    color: var(--text);
+    border-left: 3px solid var(--accent);
+    padding-left: 12px;
+  }
+
+  .course-panel[data-course="java"] .doc-section h2 { border-left-color: var(--accent2); }
+  .course-panel[data-course="web"] .doc-section h2 { border-left-color: var(--accent3); }
+
+  .doc-section h3 {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 20px 0 8px;
+  }
+
+  .doc-section p {
+    color: #94a3b8;
+    margin-bottom: 14px;
+    font-size: 15px;
+    line-height: 1.8;
+  }
+
+  .doc-section ul, .doc-section ol {
+    color: #94a3b8;
+    padding-left: 22px;
+    margin-bottom: 14px;
+  }
+
+  .doc-section li { margin-bottom: 6px; font-size: 14px; }
+
+  /* Complexity table */
+  .complexity-table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 14px 0;
+    font-size: 13px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .complexity-table th {
+    background: var(--surface);
+    color: var(--accent);
+    padding: 10px 14px;
+    text-align: left;
+    border: 1px solid var(--border);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .course-panel[data-course="java"] .complexity-table th { color: var(--accent2); }
+  .course-panel[data-course="web"] .complexity-table th { color: var(--accent3); }
+
+  .complexity-table td {
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    color: #94a3b8;
+  }
+
+  .complexity-table tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+
+  /* Code blocks */
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    overflow-x: auto;
+    margin: 14px 0 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #e2e8f0;
+    position: relative;
+  }
+
+  pre::before {
+    content: attr(data-lang);
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-family: 'Syne', sans-serif;
+  }
+
+  .kw { color: #c792ea; }
+  .fn { color: #82aaff; }
+  .str { color: #c3e88d; }
+  .num { color: #f78c6c; }
+  .cm { color: #546e7a; font-style: italic; }
+  .cls { color: #ffcb6b; }
+
+  /* Info box */
+  .info-box {
+    background: rgba(0,212,255,0.06);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-size: 14px;
+    color: #94a3b8;
+  }
+
+  .info-box strong { color: var(--accent); }
+
+  .info-box.orange { background: rgba(255,107,53,0.06); border-color: rgba(255,107,53,0.2); }
+  .info-box.orange strong { color: var(--accent2); }
+
+  .info-box.purple { background: rgba(124,58,237,0.06); border-color: rgba(124,58,237,0.2); }
+  .info-box.purple strong { color: var(--accent3); }
+
+  /* Section divider */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 48px 0;
+  }
+
+  /* Mobile sidebar toggle */
+  .sidebar-toggle {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 18px;
+  }
+
+  @media (max-width: 768px) {
+    .sidebar-toggle { display: block; }
+    .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+    .sidebar.open { transform: translateX(0); z-index: 999; }
+    .content-area { margin-left: 0; padding: 24px 20px; }
+    .course-tabs { display: none; }
+    .tab-btn { font-size: 11px; padding: 6px 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="topbar-left">
+    <a href="../index.html" class="logo">LearnStack</a>
+    <div class="course-tabs">
+      <button class="tab-btn active" data-course="dsa" onclick="switchCourse('dsa')">📘 DSA</button>
+      <button class="tab-btn" data-course="java" onclick="switchCourse('java')">☕ Java</button>
+      <button class="tab-btn" data-course="web" onclick="switchCourse('web')">🌐 Web Dev</button>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+    <a href="../index.html" class="home-link">← Back to Home</a>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+
+    <!-- DSA Sidebar -->
+    <p class="sidebar-title active" id="sidebar-title-dsa">DSA Topics</p>
+    <ul class="sidebar-nav" id="nav-dsa" data-for="dsa">
+      <li><a onclick="scrollTo('dsa','intro')"><span class="icon">🚀</span>Introduction</a></li>
+      <li><a onclick="scrollTo('dsa','array')"><span class="icon">📦</span>Arrays</a></li>
+      <li><a onclick="scrollTo('dsa','string')"><span class="icon">🔤</span>Strings</a></li>
+      <li><a onclick="scrollTo('dsa','linkedlist')"><span class="icon">🔗</span>Linked List</a></li>
+      <li><a onclick="scrollTo('dsa','stack')"><span class="icon">📚</span>Stack</a></li>
+      <li><a onclick="scrollTo('dsa','queue')"><span class="icon">🚶</span>Queue</a></li>
+      <li><a onclick="scrollTo('dsa','recursion')"><span class="icon">🔄</span>Recursion</a></li>
+      <li><a onclick="scrollTo('dsa','search')"><span class="icon">🔍</span>Searching</a></li>
+      <li><a onclick="scrollTo('dsa','sorting')"><span class="icon">↕️</span>Sorting</a></li>
+      <li><a onclick="scrollTo('dsa','tree')"><span class="icon">🌳</span>Trees</a></li>
+      <li><a onclick="scrollTo('dsa','graph')"><span class="icon">🕸️</span>Graphs</a></li>
+      <li><a onclick="scrollTo('dsa','dp')"><span class="icon">💡</span>Dynamic Programming</a></li>
+    </ul>
+
+    <!-- Java Sidebar -->
+    <p class="sidebar-title" id="sidebar-title-java">Java Topics</p>
+    <ul class="sidebar-nav" id="nav-java" data-for="java" style="display:none">
+      <li><a onclick="scrollTo('java','jintro')"><span class="icon">☕</span>Introduction</a></li>
+      <li><a onclick="scrollTo('java','jbasics')"><span class="icon">🔤</span>Syntax & Variables</a></li>
+      <li><a onclick="scrollTo('java','jcontrol')"><span class="icon">🔀</span>Control Flow</a></li>
+      <li><a onclick="scrollTo('java','joop')"><span class="icon">📦</span>OOP Concepts</a></li>
+      <li><a onclick="scrollTo('java','jarrays')"><span class="icon">📋</span>Arrays & Strings</a></li>
+      <li><a onclick="scrollTo('java','jcollections')"><span class="icon">🗂️</span>Collections</a></li>
+      <li><a onclick="scrollTo('java','jexception')"><span class="icon">⚠️</span>Exception Handling</a></li>
+      <li><a onclick="scrollTo('java','jfiles')"><span class="icon">📁</span>File Handling</a></li>
+      <li><a onclick="scrollTo('java','jthreads')"><span class="icon">⚡</span>Multithreading</a></li>
+      <li><a onclick="scrollTo('java','jjdbc')"><span class="icon">🗄️</span>JDBC</a></li>
+    </ul>
+
+    <!-- Web Sidebar -->
+    <p class="sidebar-title" id="sidebar-title-web">Web Dev Topics</p>
+    <ul class="sidebar-nav" id="nav-web" data-for="web" style="display:none">
+      <li><a onclick="scrollTo('web','wintro')"><span class="icon">🌐</span>Introduction</a></li>
+      <li><a onclick="scrollTo('web','whtml')"><span class="icon">🏗️</span>HTML Basics</a></li>
+      <li><a onclick="scrollTo('web','wforms')"><span class="icon">📝</span>HTML Forms</a></li>
+      <li><a onclick="scrollTo('web','wcss')"><span class="icon">🎨</span>CSS Basics</a></li>
+      <li><a onclick="scrollTo('web','wlayout')"><span class="icon">📐</span>Flexbox & Grid</a></li>
+      <li><a onclick="scrollTo('web','wresponsive')"><span class="icon">📱</span>Responsive Design</a></li>
+      <li><a onclick="scrollTo('web','wjs')"><span class="icon">⚡</span>JavaScript Basics</a></li>
+      <li><a onclick="scrollTo('web','wdom')"><span class="icon">🌲</span>DOM Manipulation</a></li>
+      <li><a onclick="scrollTo('web','wevents')"><span class="icon">🖱️</span>Events</a></li>
+      <li><a onclick="scrollTo('web','wfetch')"><span class="icon">🔌</span>Fetch API</a></li>
+    </ul>
+
+  </aside>
+
+  <!-- CONTENT AREA -->
+  <main class="content-area">
+
+    <!-- ══════════════ DSA PANEL ══════════════ -->
+    <div class="course-panel active" id="panel-dsa" data-course="dsa">
+
+      <div class="doc-section" id="dsa-intro">
+        <h1>🚀 Introduction to DSA</h1>
+        <p>Data Structures and Algorithms (DSA) form the backbone of computer science and software engineering. A <strong>data structure</strong> is a way of organizing and storing data so it can be accessed and modified efficiently. An <strong>algorithm</strong> is a step-by-step procedure to solve a problem.</p>
+        <p>Mastering DSA is the single most important skill for cracking technical interviews at top companies like Google, Amazon, and Microsoft, and for writing efficient, scalable software.</p>
+
+        <h2>Why Learn DSA?</h2>
+        <ul>
+          <li>Write code that runs faster and uses less memory</li>
+          <li>Solve complex problems by breaking them into smaller pieces</li>
+          <li>Crack coding interviews at top tech companies</li>
+          <li>Understand how real-world systems are built</li>
+        </ul>
+
+        <h2>Big O Notation</h2>
+        <p>Big O describes how runtime or memory grows relative to input size. It's the language we use to talk about algorithm efficiency.</p>
+        <table class="complexity-table">
+          <tr><th>Notation</th><th>Name</th><th>Example</th></tr>
+          <tr><td>O(1)</td><td>Constant</td><td>Array access by index</td></tr>
+          <tr><td>O(log n)</td><td>Logarithmic</td><td>Binary Search</td></tr>
+          <tr><td>O(n)</td><td>Linear</td><td>Linear search</td></tr>
+          <tr><td>O(n log n)</td><td>Linearithmic</td><td>Merge Sort</td></tr>
+          <tr><td>O(n²)</td><td>Quadratic</td><td>Bubble Sort</td></tr>
+          <tr><td>O(2ⁿ)</td><td>Exponential</td><td>Fibonacci (recursive)</td></tr>
+        </table>
+      </div>
+
+      <hr class="divider">
+
+      <div class="doc-section" id="dsa-array">
+        <h1>📦 Arrays</h1>
+        <p>An array is a collection of elements stored at contiguous memory locations. It is the simplest and most widely used data structure. Elements are accessed using an index starting at 0.</p>
+
+        <div class="info-box"><strong>Key Fact:</strong> Arrays provide O(1) access time because the address of any element can be computed directly: <code>base_address + index × element_size</code>.</div>
+
+        <h2>Declaring Arrays</h2>
+        <pre data-lang="JavaScript">
+<span class="cm">// Fixed array</span>
+<span class="kw">let</span> arr = [<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>, <span class="num">40</span>, <span class="num">50</span>];
+
+<span class="cm">// Access element</span>
+console.<span class="fn">log</span>(arr[<span class="num">2</span>]); <span class="cm">// → 30</span>
+
+<span class="cm">// Modify element</span>
+arr[<span class="num">1</span>] = <span class="num">99</span>;
+
+<span class="cm">// Length</span>
+console.<span class="fn">log</span>(arr.length); <span class="cm">// → 5</span></pre>
+
+        <h2>Common Operations</h2>
+        <table class="complexity-table">
+          <tr><th>Operation</th><th>Time</th><th>Notes</th></tr>
+          <tr><td>Access</td><td>O(1)</td><td>Direct index</td></tr>
+          <tr><td>Search</td><td>O(n)</td><td>Linear scan</td></tr>
+          <tr><td>Insert at end</td><td>O(1)</td><td>Amortized (dynamic arrays)</td></tr>
+          <tr><td>Insert at middle</td><td>O(n)</td><td>Shift elements right</td></tr>
+          <tr><td>Delete</td><td>O(n)</td><td>Shift elements left</td></tr>
+        </table>
+
+        <h2>Two Pointer Technique</h2>
+        <p>A powerful pattern for problems on arrays — use two indices moving toward each other.</p>
+        <pre data-lang="JavaScript">
+<span class="cm">// Check if array is palindrome</span>
+<span class="kw">function</span> <span class="fn">isPalindrome</span>(arr) {
+  <span class="kw">let</span> left = <span class="num">0</span>, right = arr.length - <span class="num">1</span>;
+  <span class="kw">while</span> (left &lt; right) {
+    <span class="kw">if</span> (arr[left] !== arr[right]) <span class="kw">return</span> <span class="kw">false</span>;
+    left++;
+    right--;
+  }
+  <span class="kw">return</span> <span class="kw">true</span>;
+}</pre>
+
+        <h2>Sliding Window</h2>
+        <p>Used to find subarrays of a fixed or variable size efficiently in O(n).</p>
+        <pre data-lang="JavaScript">
+<span class="cm">// Maximum sum of k consecutive elements</span>
+<span class="kw">function</span> <span class="fn">maxSumWindow</span>(arr, k) {
+  <span class="kw">let</span> sum = <span class="num">0</span>;
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i &lt; k; i++) sum += arr[i];
+  <span class="kw">let</span> maxSum = sum;
+  <span class="kw">for</span> (<span class="kw">let</span> i = k; i &lt; arr.length; i++) {
+    sum += arr[i] - arr[i - k];
+    maxSum = Math.<span class="fn">max</span>(maxSum, sum);
+  }
+  <span class="kw">return</span> maxSum;
+}</pre>
+      </div>
+
+      <hr class="divider">
+
+      <div class="doc-section" id="dsa-string">
+        <h1>🔤 Strings</h1>
+        <p>A string is a sequence of characters. In JavaScript, strings are immutable — you cannot change individual characters directly.</p>
+
+        <h2>Common String Methods</h2>
+        <pre data-lang="JavaScript">
+<span class="kw">let</span> s = <span class="str">"hello world"</span>;
+
+s.<span class="fn">length</span>;          <span class="cm">// 11</span>
+s.<span class="fn">toUpperCase</span>();  <span class="cm">// "HELLO WORLD"</span>
+s.<span class="fn">split</span>(<span class="str">" "</span>);     <span class="cm">// ["hello", "world"]</span>
+s.<span class="fn">includes</span>(<span class="str">"world"</span>); <span class="cm">// true</span>
+s.<span class="fn">slice</span>(<span class="num">0</span>, <span class="num">5</span>);   <span class="cm">// "hello"</span>
+s.<span class="fn">replace</span>(<span class="str">"world"</span>, <span class="str">"JS"</span>); <span class="cm">// "hello JS"</span></pre>
+
+        <h2>Reverse a String</h2>
+        <pre data-lang="JavaScript">
+<span class="kw">function</span> <span class="fn">reverseString</span>(s) {
+  <span class="kw">return</span> s.<span class="fn">split</span>(<span class="str">""</span>).<span class="fn">reverse</span>().<span class="fn">join</span>(<span class="str">""</span>);
+}</pre>
+
+        <h2>Check Anagram</h2>
+        <p>Two strings are anagrams if they contain the same characters in any order.</p>
+        <pre data-lang="JavaScript">
+<span class="kw">function</span> <span class="fn">isAnagram</span>(a, b) {
+  <span class="kw">if</span> (a.length !== b.length) <span class="kw">return</span> <span class="kw">false</span>;
+  <span class="kw">return</span> a.<span class="fn">split</span>(<span class="str">""</span>).<span class="fn">sort</span>().<span class="fn">join</span>(<span class="str">""</span>) === b.<span class="fn">split</span>(<span class="str">""</span>).<span class="fn">sort</span>().<span class="fn">join</span>(<span class="str">""</span>);
+}</pre>
+      </div>
+
+      <hr class="divider">
+
+      <div class="doc-section" id="dsa-linkedlist">
+        <h1>🔗 Linked List</h1>
+        <p>A linked list is a linear data structure where elements (called <strong>nodes</strong>) are stored in non-contiguous memory locations. Each node contains data and a pointer to the next node.</p>
+
+        <h2>Types</h2>
+        <ul>
+          <li><strong>Singly Linked List</strong> – each node points to the next</li>
+          <li><strong>Doubly Linked List</strong> – each node points to both next and previous</li>
+          <li><strong>Circular Linked List</strong> – tail points back to head</li>
+        </ul>
+
+        <h2>Node & Basic Operations</h2>
+        <pre data-lang="JavaScript">
+<span class="kw">class</span> <span class="cls">Node</span> {
+  <span class="fn">constructor</span>(data) {
+    <span class="kw">this</span>.data = data;
+    <span class="kw">this</span>.next = <span class="kw">null</span>;
+  }
+}
+
+<span class="kw">class</span> <span class="cls">LinkedList</span> {
+  <span class="fn">constructor</span>() { <span class="kw">this</span>.head = <span class="kw">null</span>; }
+
+  <span class="fn">append</span>(data) {
+    <span class="kw">let</span> node = <span class="kw">new</span> <span class="cls">Node</span>(data);
+    <span class="kw">if</span> (!<span class="kw">this</span>.head) { <span class="kw">this</span>.head = node; <span class="kw">return</span>; }
+    <span class="kw">let</span> curr = <span class="kw">this</span>.head;
+    <span class="kw">while</span> (curr.next) curr = curr.next;
+    curr.next = node;
+  }
+
+  <span class="fn">print</span>() {
+    <span class="kw">let</span> curr = <span class="kw">this</span>.head;
+    <span class="kw">while</span> (curr) { console.<span class="fn">log</span>(curr.data); curr = curr.next; }
+  }
+}</pre>
+
+        <table class="complexity-table">
+          <tr><th>Operation</th><th>Singly</th><th>Doubly</th></tr>
+          <tr><td>Access</td><td>O(n)</td><td>O(n)</td></tr>
+          <tr><td>Insert at head</td><td>O(1)</td><td>O(1)</td></tr>
+          <tr><td>Insert at tail</td><td>O(n)</td><td>O(1)*</td></tr>
+          <tr><td>Delete</td><td>O(n)</td><td>O(n)</td></tr>
+        </table>
+      </div>
+
+      <hr class="divider">
+
+      <div class="doc-section" id="dsa-stack">
+        <h1>📚 Stack</h1>
+        <p>A stack is a <strong>LIFO</strong> (Last In, First Out) data structure. Think of a pile of plates — you can only add or remove from the top.</p>
+
+        <h2>Operations</h2>
+        <ul>
+          <li><strong>push()</strong> – add element to top</li>
+          <li><strong>pop()</strong> – remove element from top</li>
+          <li><strong>peek()</strong> – view top element without removing</li>
+          <li><strong>isEmpty()</strong> – check if stack is empty</li>
+        </ul>
+
+        <pre data-lang="JavaScript">
+<span class="kw">class</span> <span class="cls">Stack</span> {
+  <span class="fn">constructor</span>() { <span class="kw">this</span>.items = []; }
+  <span class="fn">push</span>(el) { <span class="kw">this</span>.items.<span class="fn">push</span>(el); }
+  <span class="fn">pop</span>()    { <span class="kw">return</span> <span class="kw">this</span>.items.<span class="fn">pop</span>(); }
+  <span class="fn">peek</span>()   { <span class="kw">return</span> <span class="kw">this</span>.items[<span class="kw">this</span>.items.length - <span class="num">1</span>]; }
+  <span class="fn">isEmpty</span>(){ <span class="kw">return</span> <span class="kw">this</span>.items.length === <span class="num">0</span>; }
+}
+
+<span class="cm">// Real use: Balanced parentheses check</span>
+<span class="kw">function</span> <span class="fn">isBalanced</span>(s) {
+  <span class="kw">let</span> stack = [];
+  <span class="kw">const</span> map = {<span class="str">')'</span>:<span class="str">'('</span>, <span class="str">'}'</span>:<span class="str">'{'</span>, <span class="str">']'</span>:<span class="str">'['</span>};
+  <span class="kw">for</span> (<span class="kw">let</span> ch <span class="kw">of</span> s) {
+    <span class="kw">if</span> (<span class="str">"({["</span>.<span class="fn">includes</span>(ch)) stack.<span class="fn">push</span>(ch);
+    <span class="kw">else if</span> (stack.<span class="fn">pop</span>() !== map[ch]) <span class="kw">return</span> <span class="kw">false</span>;
+  }
+  <span class="kw">return</span> stack.length === <span class="num">0</span>;
+}</pre>
+
+        <div class="info-box"><strong>Real-world uses:</strong> Undo/Redo in editors, function call stack, browser back button, expression evaluation.</div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="doc-section" id="dsa-queue">
+        <h1>🚶 Queue</h1>
+        <p>A queue is a <strong>FIFO</strong> (First In, First Out) data structure. Think of a line at a ticket counter — the first person to join is the first to be served.</p>
+
+        <h2>Operations</h2>
+        <pre data-lang="JavaScript">
+<span class="kw">class</span> <span class="cls">Queue</span> {
+  <span class="fn">constructor</span>() { <span class="kw">this</span>.items = []; }
+  <span class="fn">enqueue</span>(el) { <span class="kw">this</span>.items.<span class="fn">push</span>(el); }
+  <span class="fn">dequeue</span>()   { <span class="kw">return</span> <span class="kw">this</span>.items.<span class="fn">shift</span>(); }
+  <span class="fn">front</span>()     { <span class="kw">return</span> <span class="kw">this</span>.items[<span class="num">0</span>]; }
+  <span class="fn">isEmpty</span>()   { <span class="kw">return</span> <span class="kw">this</span>.items.length === <span class="num">0</span>; }
+}
+
+<span class="cm">// BFS uses a Queue</span>
+<span class="kw">function</span> <span class="fn">bfs</span>(graph, start) {
+  <span class="kw">let</span> visited = <span class="kw">new</span> <span class="cls">Set</span>([start]);
+  <span class="kw">let</span> queue = [start];
+  <span class="kw">while</span> (queue.length) {
+    <span class="kw">let</span> node = queue.<span class="fn">shift</span>();
+    console.<span class="fn">log</span>(node);
+    <span class="kw">for</span> (<span class="kw">let</span> neighbor <span class="kw">of</span> graph[node]) {
+      <span class="kw">if</span> (!visited.<span class="fn">has</span>(neighbor)) {
+        visited.<span class="fn">add</span>(neighbor);
+        queue.<span class="fn">push</span>(neighbor);
+      }
+    }
+  }
+}</pre>
+
+        <h2>Types of Queues</h2>
+        <ul>
+          <li><strong>Simple Queue</strong> – basic FIFO</li>
+          <li><strong>Circular Queue</strong> – rear wraps around to front</li>
+          <li><strong>Priority Queue</strong> – elements have priority (like a min-heap)</li>
+          <li><strong>Deque</strong> – insertion/deletion at both ends</li>
+        </ul>
+      </div>
+
+      <hr class="divider">
+
+      <div class="doc-section" id="dsa-recursion">
+        <h1>🔄 Recursion</h1>
+        <p>Recursion is a technique where a function calls itself to solve a smaller version of the same problem. Every recursive function needs a <strong>base case</strong> (to stop) and a <strong>recursive case</strong> (to reduce the problem).</p>
+
+        <pre data-lang="JavaScript">
+<span class="cm">// Factorial: n! = n × (n-1)!</span>
+<span class="kw">function</span> <span class="fn">factorial</span>(n) {
+  <span class="kw">if</span> (n === <span class="num">0</span>) <span class="kw">return</span> <span class="num">1</span>; <span class="cm">// base case</span>
+  <span class="kw">return</span> n * <span class="fn">factorial</span>(n - <span class="num">1</span>); <span class="cm">// recursive case</span>
+}
+
+<span class="cm">// Fibonacci</span>
+<span class="kw">function</span> <span class="fn">fib</span>(n) {
+  <span class="kw">if</span> (n &lt;= <span class="num">1</span>) <span class="kw">return</span> n;
+  <span class="kw">return</span> <span class="fn">fib</span>(n - <span class="num">1</span>) + <span class="fn">fib</span>(n - <span class="num">2</span>);
+}
+
+<span class="cm">// Sum of array recursively</span>
+<span class="kw">function</span> <span class="fn">sumArray</span>(arr, i = <span class="num">0</span>) {
+  <span class="kw">if</span> (i === arr.length) <span class="kw">return</span> <span class="num">0</span>;
+  <span class="kw">return</span> arr[i] + <span class="fn">sumArray</span>(arr, i + <span class="num">1</span>);
+}</span></pre>
+
+        <div class="info-box"><strong>Tip:</strong> Always identify the base case first. Without it, recursion causes a stack overflow.</div>
+
+        <h2>Call Stack Visualization</h2>
+        <pre data-lang="Trace">
+factorial(3)
+  → 3 × factorial(2)
+        → 2 × factorial(1)
+              → 1 × factorial(0)
+                    → returns 1
+              → returns 1
+        → returns 2
+  → returns 6</pre>
+      </div>
+
+      <hr class="divider">
+
+      <div class="doc-section" id="dsa-search">
+        <h1>🔍 Searching Algorithms</h1>
+
+        <h2>Linear Search</h2>
+        <p>Checks each element one by one. Works on unsorted arrays. Time: O(n).</p>
+        <pre data-lang="JavaScript">
+<span class="kw">function</span> <span class="fn">linearSearch</span>(arr, target) {
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i &lt; arr.length; i++) {
+    <span class="kw">if</span> (arr[i] === target) <span class="kw">return</span> i;
+  }
+  <span class="kw">return</span> -<span class="num">1</span>;
+}</pre>
+
+        <h2>Binary Search</h2>
+        <p>Works only on <strong>sorted</strong> arrays. Repeatedly halves the search range. Time: O(log n).</p>
+        <pre data-lang="JavaScript">
+<span class="kw">function</span> <span class="fn">binarySearch</span>(arr, target) {
+  <span class="kw">let</span> left = <span class="num">0</span>, right = arr.length - <span class="num">1</span>;
+  <span class="kw">while</span> (left &lt;= right) {
+    <span class="kw">let</span> mid = Math.<span class="fn">floor</span>((left + right) / <span class="num">2</span>);
+    <span class="kw">if</span> (arr[mid] === target) <span class="kw">return</span> mid;
+    <span class="kw">else if</span> (arr[mid] &lt; target) left = mid + <span class="num">1</span>;
+    <span class="kw">else</span> right = mid - <span class="num">1</span>;
+  }
+  <span class="kw">return</span> -<span class="num">1</span>;
+}
+
+<span class="cm">// Example</span>
+<span class="fn">binarySearch</span>([<span class="num">2</span>,<span class="num">5</span>,<span class="num">8</span>,<span class="num">12</span>,<span class="num">16</span>], <span class="num">12</span>); <span class="cm">// → 3</span></pre>
+
+        <table class="complexity-table">
+          <tr><th>Algorithm</th><th>Best</th><th>Average</th><th>Worst</th><th>Requirement</th></tr>
+          <tr><td>Linear Search</td><td>O(1)</td><td>O(n)</td><td>O(n)</td><td>None</td></tr>
+          <tr><td>Binary Search</td><td>O(1)</td><td>O(log n)</td><td>O(log n)</td><td>Sorted array</td></tr>
+        </table>
+      </div>
+
+      <hr class="divider">
+
+      <div class="doc-section" id="dsa-sorting">
+        <h1>↕️ Sorting Algorithms</h1>
+
+        <h2>Bubble Sort</h2>
+        <p>Repeatedly swaps adjacent elements if they are in the wrong order. Simple but slow — O(n²).</p>
+        <pre data-lang="JavaScript">
+<span class="kw">function</span> <span class="fn">bubbleSort</span>(arr) {
+  <span class="kw">let</span> n = arr.length;
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i &lt; n; i++) {
+    <span class="kw">for</span> (<span class="kw">let</span> j = <span class="num">0</span>; j &lt; n - i - <span class="num">1</span>; j++) {
+      <span class="kw">if</span> (arr[j] &gt; arr[j+<span class="num">1</span>]) {
+        [arr[j], arr[j+<span class="num">1</span>]] = [arr[j+<span class="num">1</span>], arr[j]];
+      }
+    }
+  }
+  <span class="kw">return</span> arr;
+}</pre>
+
+        <h2>Selection Sort</h2>
+        <p>Finds the minimum element and places it at the correct position each pass.</p>
+        <pre data-lang="JavaScript">
+<span class="kw">function</span> <span class="fn">selectionSort</span>(arr) {
+  <span class="kw">let</span> n = arr.length;
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i &lt; n; i++) {
+    <span class="kw">let</span> minIdx = i;
+    <span class="kw">for</span> (<span class="kw">let</span> j = i + <span class="num">1</span>; j &lt; n; j++) {
+      <span class="kw">if</span> (arr[j] &lt; arr[minIdx]) minIdx = j;
+    }
+    [arr[i], arr[minIdx]] = [arr[minIdx], arr[i]];
+  }
+  <span class="kw">return</span> arr;
+}</pre>
+
+        <h2>Merge Sort</h2>
+        <p>Divide and conquer — splits array in half, sorts each half, then merges. O(n log n).</p>
+        <pre data-lang="JavaScript">
+<span class="kw">function</span> <span class="fn">mergeSort</span>(arr) {
+  <span class="kw">if</span> (arr.length &lt;= <span class="num">1</span>) <span class="kw">return</span> arr;
+  <span class="kw">let</span> mid = Math.<span class="fn">floor</span>(arr.length / <span class="num">2</span>);
+  <span class="kw">let</span> left  = <span class="fn">mergeSort</span>(arr.<span class="fn">slice</span>(<span class="num">0</span>, mid));
+  <span class="kw">let</span> right = <span class="fn">mergeSort</span>(arr.<span class="fn">slice</span>(mid));
+  <span class="kw">return</span> <span class="fn">merge</span>(left, right);
+}
+
+<span class="kw">function</span> <span class="fn">merge</span>(l, r) {
+  <span class="kw">let</span> res = [], i = <span class="num">0</span>, j = <span class="num">0</span>;
+  <span class="kw">while</span> (i &lt; l.length &amp;&amp; j &lt; r.length) {
+    res.<span class="fn">push</span>(l[i] &lt; r[j] ? l[i++] : r[j++]);
+  }
+  <span class="kw">return</span> [...res, ...l.<span class="fn">slice</span>(i), ...r.<span class="fn">slice</span>(j)];
+}</pre>
+
+        <table class="complexity-table">
+          <tr><th>Algorithm</th><th>Best</th><th>Average</th><th>Worst</th><th>Space</th></tr>
+          <tr><td>Bubble Sort</td><td>O(n)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td></tr>
+          <tr><td>Selection Sort</td><td>O(n²)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td></tr>
+          <tr><td>Insertion Sort</td><td>O(n)</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td></tr>
+          <tr><td>Merge Sort</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n)</td></tr>
+          <tr><td>Quick Sort</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n²)</td><td>O(log n)</td></tr>
+        </table>
+      </div>
+
+      <hr class="divider">
+
+      <div class="doc-section" id="dsa-tree">
+        <h1>🌳 Trees</h1>
+        <p>A tree is a hierarchical data structure with a <strong>root</strong> node, and each node has zero or more <strong>children</strong>. Trees have no cycles.</p>
+
+        <h2>Binary Tree</h2>
+        <p>Each node has at most two children: left and right.</p>
+        <pre data-lang="JavaScript">
+<span class="kw">class</span> <span class="cls">TreeNode</span> {
+  <span class="fn">constructor</span>(val) {
+    <span class="kw">this</span>.val = val;
+    <span class="kw">this</span>.left = <span class="kw">null</span>;
+    <span class="kw">this</span>.right = <span class="kw">null</span>;
+  }
+}</pre>
+
+        <h2>Tree Traversals</h2>
+        <pre data-lang="JavaScript">
+<span class="cm">// Inorder: Left → Root → Right (gives sorted order for BST)</span>
+<span class="kw">function</span> <span class="fn">inorder</span>(node) {
+  <span class="kw">if</span> (!node) <span class="kw">return</span>;
+  <span class="fn">inorder</span>(node.left);
+  console.<span class="fn">log</span>(node.val);
+  <span class="fn">inorder</span>(node.right);
+}
+
+<span class="cm">// Preorder: Root → Left → Right</span>
+<span class="kw">function</span> <span class="fn">preorder</span>(node) {
+  <span class="kw">if</span> (!node) <span class="kw">return</span>;
+  console.<span class="fn">log</span>(node.val);
+  <span class="fn">preorder</span>(node.left);
+  <span class="fn">preorder</span>(node.right);
+}
+
+<span class="cm">// Postorder: Left → Right → Root</span>
+<span class="kw">function</span> <span class="fn">postorder</span>(node) {
+  <span class="kw">if</span> (!node) <span class="kw">return</span>;
+  <span class="fn">postorder</span>(node.left);
+  <span class="fn">postorder</span>(node.right);
+  console.<span class="fn">log</span>(node.val);
+}</pre>
+
+        <h2>Binary Search Tree (BST)</h2>
+        <p>Left subtree ≤ node ≤ Right subtree. Search, insert, delete all O(log n) on average.</p>
+
+        <div class="info-box"><strong>Key Terms:</strong> Height, Depth, Leaf node, Root, Balanced tree, Full binary tree, Complete binary tree.</div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="doc-section" id="dsa-graph">
+        <h1>🕸️ Graphs</h1>
+        <p>A graph is a collection of <strong>vertices</strong> (nodes) connected by <strong>edges</strong>. Graphs can be directed or undirected, weighted or unweighted.</p>
+
+        <h2>Representation</h2>
+        <pre data-lang="JavaScript">
+<span class="cm">// Adjacency List (most common)</span>
+<span class="kw">const</span> graph = {
+  <span class="str">A</span>: [<span class="str">"B"</span>, <span class="str">"C"</span>],
+  <span class="str">B</span>: [<span class="str">"A"</span>, <span class="str">"D"</span>],
+  <span class="str">C</span>: [<span class="str">"A"</span>, <span class="str">"E"</span>],
+  <span class="str">D</span>: [<span class="str">"B"</span>],
+  <span class="str">E</span>: [<span class="str">"C"</span>]
+};</pre>
+
+        <h2>Depth First Search (DFS)</h2>
+        <pre data-lang="JavaScript">
+<span class="kw">function</span> <span class="fn">dfs</span>(graph, node, visited = <span class="kw">new</span> <span class="cls">Set</span>()) {
+  <span class="kw">if</span> (visited.<span class="fn">has</span>(node)) <span class="kw">return</span>;
+  visited.<span class="fn">add</span>(node);
+  console.<span class="fn">log</span>(node);
+  <span class="kw">for</span> (<span class="kw">let</span> neighbor <span class="kw">of</span> graph[node]) {
+    <span class="fn">dfs</span>(graph, neighbor, visited);
+  }
+}</pre>
+
+        <h2>Breadth First Search (BFS)</h2>
+        <pre data-lang="JavaScript">
+<span class="kw">function</span> <span class="fn">bfs</span>(graph, start) {
+  <span class="kw">let</span> visited = <span class="kw">new</span> <span class="cls">Set</span>([start]);
+  <span class="kw">let</span> queue = [start];
+  <span class="kw">while</span> (queue.length) {
+    <span class="kw">let</span> node = queue.<span class="fn">shift</span>();
+    console.<span class="fn">log</span>(node);
+    <span class="kw">for</span> (<span class="kw">let</span> n <span class="kw">of</span> graph[node]) {
+      <span class="kw">if</span> (!visited.<span class="fn">has</span>(n)) { visited.<span class="fn">add</span>(n); queue.<span class="fn">push</span>(n); }
+    }
+  }
+}</pre>
+
+        <table class="complexity-table">
+          <tr><th></th><th>DFS</th><th>BFS</th></tr>
+          <tr><td>Time</td><td>O(V+E)</td><td>O(V+E)</td></tr>
+          <tr><td>Space</td><td>O(V)</td><td>O(V)</td></tr>
+          <tr><td>Use case</td><td>Path finding, cycle detection</td><td>Shortest path (unweighted)</td></tr>
+        </table>
+      </div>
+
+      <hr class="divider">
+
+      <div class="doc-section" id="dsa-dp">
+        <h1>💡 Dynamic Programming</h1>
+        <p>Dynamic Programming (DP) solves complex problems by breaking them into overlapping subproblems and storing results to avoid recomputation. Two approaches: <strong>Top-down (Memoization)</strong> and <strong>Bottom-up (Tabulation)</strong>.</p>
+
+        <h2>Fibonacci – Memoization</h2>
+        <pre data-lang="JavaScript">
+<span class="kw">function</span> <span class="fn">fib</span>(n, memo = {}) {
+  <span class="kw">if</span> (n <span class="kw">in</span> memo) <span class="kw">return</span> memo[n];
+  <span class="kw">if</span> (n &lt;= <span class="num">1</span>) <span class="kw">return</span> n;
+  memo[n] = <span class="fn">fib</span>(n-<span class="num">1</span>, memo) + <span class="fn">fib</span>(n-<span class="num">2</span>, memo);
+  <span class="kw">return</span> memo[n];
+}</pre>
+
+        <h2>Fibonacci – Tabulation</h2>
+        <pre data-lang="JavaScript">
+<span class="kw">function</span> <span class="fn">fib</span>(n) {
+  <span class="kw">let</span> dp = [<span class="num">0</span>, <span class="num">1</span>];
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">2</span>; i &lt;= n; i++) {
+    dp[i] = dp[i-<span class="num">1</span>] + dp[i-<span class="num">2</span>];
+  }
+  <span class="kw">return</span> dp[n];
+}</pre>
+
+        <h2>0/1 Knapsack Problem</h2>
+        <pre data-lang="JavaScript">
+<span class="kw">function</span> <span class="fn">knapsack</span>(weights, values, W) {
+  <span class="kw">let</span> n = weights.length;
+  <span class="kw">let</span> dp = Array.<span class="fn">from</span>({length: n+<span class="num">1</span>}, () =&gt; <span class="kw">new</span> <span class="cls">Array</span>(W+<span class="num">1</span>).<span class="fn">fill</span>(<span class="num">0</span>));
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">1</span>; i &lt;= n; i++) {
+    <span class="kw">for</span> (<span class="kw">let</span> w = <span class="num">0</span>; w &lt;= W; w++) {
+      dp[i][w] = dp[i-<span class="num">1</span>][w];
+      <span class="kw">if</span> (weights[i-<span class="num">1</span>] &lt;= w) {
+        dp[i][w] = Math.<span class="fn">max</span>(dp[i][w], dp[i-<span class="num">1</span>][w - weights[i-<span class="num">1</span>]] + values[i-<span class="num">1</span>]);
+      }
+    }
+  }
+  <span class="kw">return</span> dp[n][W];
+}</pre>
+
+        <div class="info-box"><strong>DP Checklist:</strong> Does the problem have overlapping subproblems? Does it have optimal substructure? If yes to both → DP is likely the right approach.</div>
+      </div>
+
+    </div><!-- end DSA panel -->
+
+
+    <!-- ══════════════ JAVA PANEL ══════════════ -->
+    <div class="course-panel" id="panel-java" data-course="java">
+
+      <div class="doc-section" id="java-jintro">
+        <h1>☕ Introduction to Java</h1>
+        <p>Java is a high-level, object-oriented, platform-independent programming language developed by Sun Microsystems in 1995. It follows the principle <strong>"Write Once, Run Anywhere"</strong> — compiled Java code runs on any platform with a JVM (Java Virtual Machine).</p>
+
+        <h2>Why Java?</h2>
+        <ul>
+          <li>Platform independent via JVM</li>
+          <li>Strongly typed and object-oriented</li>
+          <li>Rich standard library (Java API)</li>
+          <li>Widely used in enterprise, Android, and backend development</li>
+        </ul>
+
+        <h2>Java Program Execution</h2>
+        <pre data-lang="Diagram">
+Source Code (.java)
+      ↓ javac (compiler)
+Bytecode (.class)
+      ↓ JVM
+Machine Code (runs on OS)</pre>
+
+        <pre data-lang="Java">
+<span class="kw">public class</span> <span class="cls">HelloWorld</span> {
+  <span class="kw">public static void</span> <span class="fn">main</span>(String[] args) {
+    System.out.<span class="fn">println</span>(<span class="str">"Hello, World!"</span>);
+  }
+}</pre>
+      </div>
+
+      <hr class="divider">
+
+      <div class="doc-section" id="java-jbasics">
+        <h1>🔤 Syntax &amp; Variables</h1>
+
+        <h2>Data Types</h2>
+        <table class="complexity-table">
+          <tr><th>Type</th><th>Size</th><th>Example</th></tr>
+          <tr><td>int</td><td>4 bytes</td><td>int x = 10;</td></tr>
+          <tr><td>long</td><td>8 bytes</td><td>long y = 99999L;</td></tr>
+          <tr><td>double</td><td>8 bytes</td><td>double pi = 3.14;</td></tr>
+          <tr><td>char</td><td>2 bytes</td><td>char c = 'A';</td></tr>
+          <tr><td>boolean</td><td>1 bit</td><td>boolean b = true;</td></tr>
+          <tr><td>String</td><td>varies</td><td>String s = "hi";</td></tr>
+        </table>
+
+        <pre data-lang="Java">
+<span class="kw">int</span> age = <span class="num">20</span>;
+<span class="kw">double</span> price = <span class="num">99.99</span>;
+<span class="kw">String</span> name = <span class="str">"Alice"</span>;
+<span class="kw">boolean</span> isStudent = <span class="kw">true</span>;
+<span class="kw">char</span> grade = <span class="str">'A'</span>;
+
+<span class="cm">// Type casting</span>
+<span class="kw">int</span> x = (<span class="kw">int</span>) <span class="num">3.99</span>; <span class="cm">// → 3</span>
+
+<span class="cm">// Constants</span>
+<span class="kw">final int</span> MAX = <span class="num">100</span>;</pre>
+      </div>
+
+      <hr class="divider">
+
+      <div class="doc-section" id="java-jcontrol">
+        <h1>🔀 Control Flow</h1>
+
+        <h2>If-Else</h2>
+        <pre data-lang="Java">
+<span class="kw">int</span> marks = <span class="num">75</span>;
+<span class="kw">if</span> (marks &gt;= <span class="num">90</span>) {
+  System.out.<span class="fn">println</span>(<span class="str">"A Grade"</span>);
+} <span class="kw">else if</span> (marks &gt;= <span class="num">60</span>) {
+  System.out.<span class="fn">println</span>(<span class="str">"B Grade"</span>);
+} <span class="kw">else</span> {
+  System.out.<span class="fn">println</span>(<span class="str">"C Grade"</span>);
+}</pre>
+
+        <h2>Loops</h2>
+        <pre data-lang="Java">
+<span class="cm">// For loop</span>
+<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; <span class="num">5</span>; i++) {
+  System.out.<span class="fn">println</span>(i);
+}
+
+<span class="cm">// While loop</span>
+<span class="kw">int</span> n = <span class="num">10</span>;
+<span class="kw">while</span> (n &gt; <span class="num">0</span>) {
+  System.out.<span class="fn">println</span>(n);
+  n -= <span class="num">2</span>;
+}
+
+<span class="cm">// Enhanced for (for-each)</span>
+<span class="kw">int</span>[] arr = {<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">4</span>};
+<span class="kw">for</span> (<span class="kw">int</span> val : arr) {
+  System.out.<span class="fn">println</span>(val);
+}</pre>
+
+        <h2>Switch</h2>
+        <pre data-lang="Java">
+<span class="kw">int</span> day = <span class="num">3</span>;
+<span class="kw">switch</span> (day) {
+  <span class="kw">case</span> <span class="num">1</span>: System.out.<span class="fn">println</span>(<span class="str">"Monday"</span>); <span class="kw">break</span>;
+  <span class="kw">case</span> <span class="num">2</span>: System.out.<span class="fn">println</span>(<span class="str">"Tuesday"</span>); <span class="kw">break</span>;
+  <span class="kw">case</span> <span class="num">3</span>: System.out.<span class="fn">println</span>(<span class="str">"Wednesday"</span>); <span class="kw">break</span>;
+  <span class="kw">default</span>: System.out.<span class="fn">println</span>(<span class="str">"Other"</span>);
+}</pre>
+      </div>
+
+      <hr class="divider">
+
+      <div class="doc-section" id="java-joop">
+        <h1>📦 OOP Concepts</h1>
+        <p>Java is built around four pillars of Object-Oriented Programming.</p>
+
+        <h2>1. Encapsulation</h2>
+        <p>Wrapping data and methods into a class, hiding internal details using private/public.</p>
+        <pre data-lang="Java">
+<span class="kw">class</span> <span class="cls">Student</span> {
+  <span class="kw">private</span> String name;
+  <span class="kw">private int</span> age;
+
+  <span class="kw">public</span> String <span class="fn">getName</span>() { <span class="kw">return</span> name; }
+  <span class="kw">public void</span> <span class="fn">setName</span>(String n) { <span class="kw">this</span>.name = n; }
+}</pre>
+
+        <h2>2. Inheritance</h2>
+        <p>A child class inherits properties and methods from a parent class using <code>extends</code>.</p>
+        <pre data-lang="Java">
+<span class="kw">class</span> <span class="cls">Animal</span> {
+  <span class="kw">void</span> <span class="fn">sound</span>() { System.out.<span class="fn">println</span>(<span class="str">"Some sound"</span>); }
+}
+
+<span class="kw">class</span> <span class="cls">Dog</span> <span class="kw">extends</span> <span class="cls">Animal</span> {
+  <span class="kw">void</span> <span class="fn">sound</span>() { System.out.<span class="fn">println</span>(<span class="str">"Woof!"</span>); }
+}</pre>
+
+        <h2>3. Polymorphism</h2>
+        <p>Same method name behaves differently. Runtime polymorphism via method overriding.</p>
+        <pre data-lang="Java">
+<span class="cls">Animal</span> a = <span class="kw">new</span> <span class="cls">Dog</span>();
+a.<span class="fn">sound</span>(); <span class="cm">// Output: Woof! (dynamic dispatch)</span></pre>
+
+        <h2>4. Abstraction</h2>
+        <p>Hiding implementation details. Achieved via abstract classes and interfaces.</p>
+        <pre data-lang="Java">
+<span class="kw">interface</span> <span class="cls">Shape</span> {
+  <span class="kw">double</span> <span class="fn">area</span>();
+}
+
+<span class="kw">class</span> <span class="cls">Circle</span> <span class="kw">implements</span> <span class="cls">Shape</span> {
+  <span class="kw">double</span> r;
+  <span class="cls">Circle</span>(<span class="kw">double</span> r) { <span class="kw">this</span>.r = r; }
+  <span class="kw">public double</span> <span class="fn">area</span>() { <span class="kw">return</span> Math.PI * r * r; }
+}</pre>
+      </div>
+
+      <hr class="divider">
+
+      <div class="doc-section" id="java-jarrays">
+        <h1>📋 Arrays &amp; Strings</h1>
+        <pre data-lang="Java">
+<span class="cm">// 1D Array</span>
+<span class="kw">int</span>[] arr = {<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>};
+System.out.<span class="fn">println</span>(arr[<span class="num">0</span>]); <span class="cm">// 10</span>
+
+<span class="cm">// 2D Array</span>
+<span class="kw">int</span>[][] matrix = {{<span class="num">1</span>,<span class="num">2</span>},{<span class="num">3</span>,<span class="num">4</span>}};
+
+<span class="cm">// String operations</span>
+String s = <span class="str">"Hello"</span>;
+s.<span class="fn">length</span>();       <span class="cm">// 5</span>
+s.<span class="fn">charAt</span>(<span class="num">0</span>);      <span class="cm">// 'H'</span>
+s.<span class="fn">substring</span>(<span class="num">1</span>,<span class="num">3</span>); <span class="cm">// "el"</span>
+s.<span class="fn">toUpperCase</span>();   <span class="cm">// "HELLO"</span>
+s.<span class="fn">equals</span>(<span class="str">"Hi"</span>);   <span class="cm">// false (use equals, not ==)</span></pre>
+      </div>
+
+      <hr class="divider">
+
+      <div class="doc-section" id="java-jcollections">
+        <h1>🗂️ Collections Framework</h1>
+        <p>The Java Collections Framework provides ready-made data structures.</p>
+
+        <h2>ArrayList</h2>
+        <pre data-lang="Java">
+<span class="kw">import</span> java.util.ArrayList;
+<span class="cls">ArrayList</span>&lt;String&gt; list = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
+list.<span class="fn">add</span>(<span class="str">"Java"</span>);
+list.<span class="fn">add</span>(<span class="str">"Python"</span>);
+list.<span class="fn">get</span>(<span class="num">0</span>);      <span class="cm">// "Java"</span>
+list.<span class="fn">size</span>();      <span class="cm">// 2</span>
+list.<span class="fn">remove</span>(<span class="num">1</span>);   <span class="cm">// removes "Python"</span></pre>
+
+        <h2>HashMap</h2>
+        <pre data-lang="Java">
+<span class="kw">import</span> java.util.HashMap;
+<span class="cls">HashMap</span>&lt;String, Integer&gt; map = <span class="kw">new</span> <span class="cls">HashMap</span>&lt;&gt;();
+map.<span class="fn">put</span>(<span class="str">"Alice"</span>, <span class="num">90</span>);
+map.<span class="fn">put</span>(<span class="str">"Bob"</span>, <span class="num">85</span>);
+map.<span class="fn">get</span>(<span class="str">"Alice"</span>); <span class="cm">// 90</span>
+map.<span class="fn">containsKey</span>(<span class="str">"Bob"</span>); <span class="cm">// true</span></pre>
+
+        <h2>HashSet</h2>
+        <pre data-lang="Java">
+<span class="cls">HashSet</span>&lt;Integer&gt; set = <span class="kw">new</span> <span class="cls">HashSet</span>&lt;&gt;();
+set.<span class="fn">add</span>(<span class="num">1</span>); set.<span class="fn">add</span>(<span class="num">2</span>); set.<span class="fn">add</span>(<span class="num">1</span>); <span class="cm">// Duplicate ignored</span>
+set.<span class="fn">contains</span>(<span class="num">2</span>); <span class="cm">// true</span>
+set.<span class="fn">size</span>();      <span class="cm">// 2</span></pre>
+      </div>
+
+      <hr class="divider">
+
+      <div class="doc-section" id="java-jexception">
+        <h1>⚠️ Exception Handling</h1>
+        <p>Exceptions are runtime errors. Java provides <code>try-catch-finally</code> to handle them gracefully.</p>
+        <pre data-lang="Java">
+<span class="kw">try</span> {
+  <span class="kw">int</span> result = <span class="num">10</span> / <span class="num">0</span>; <span class="cm">// ArithmeticException</span>
+} <span class="kw">catch</span> (<span class="cls">ArithmeticException</span> e) {
+  System.out.<span class="fn">println</span>(<span class="str">"Error: "</span> + e.<span class="fn">getMessage</span>());
+} <span class="kw">finally</span> {
+  System.out.<span class="fn">println</span>(<span class="str">"Always runs"</span>);
+}
+
+<span class="cm">// Custom Exception</span>
+<span class="kw">class</span> <span class="cls">AgeException</span> <span class="kw">extends</span> <span class="cls">Exception</span> {
+  <span class="cls">AgeException</span>(String msg) { <span class="kw">super</span>(msg); }
+}
+
+<span class="kw">void</span> <span class="fn">checkAge</span>(<span class="kw">int</span> age) <span class="kw">throws</span> <span class="cls">AgeException</span> {
+  <span class="kw">if</span> (age &lt; <span class="num">18</span>) <span class="kw">throw new</span> <span class="cls">AgeException</span>(<span class="str">"Too young!"</span>);
+}</pre>
+      </div>
+
+      <hr class="divider">
+
+      <div class="doc-section" id="java-jfiles">
+        <h1>📁 File Handling</h1>
+        <pre data-lang="Java">
+<span class="kw">import</span> java.io.*;
+
+<span class="cm">// Writing to a file</span>
+<span class="cls">FileWriter</span> fw = <span class="kw">new</span> <span class="cls">FileWriter</span>(<span class="str">"output.txt"</span>);
+fw.<span class="fn">write</span>(<span class="str">"Hello File!"</span>);
+fw.<span class="fn">close</span>();
+
+<span class="cm">// Reading from a file</span>
+<span class="cls">BufferedReader</span> br = <span class="kw">new</span> <span class="cls">BufferedReader</span>(<span class="kw">new</span> <span class="cls">FileReader</span>(<span class="str">"output.txt"</span>));
+String line;
+<span class="kw">while</span> ((line = br.<span class="fn">readLine</span>()) != <span class="kw">null</span>) {
+  System.out.<span class="fn">println</span>(line);
+}
+br.<span class="fn">close</span>();</pre>
+      </div>
+
+      <hr class="divider">
+
+      <div class="doc-section" id="java-jthreads">
+        <h1>⚡ Multithreading</h1>
+        <p>Multithreading allows a program to run multiple threads simultaneously, improving performance.</p>
+        <pre data-lang="Java">
+<span class="cm">// Method 1: Extend Thread</span>
+<span class="kw">class</span> <span class="cls">MyThread</span> <span class="kw">extends</span> <span class="cls">Thread</span> {
+  <span class="kw">public void</span> <span class="fn">run</span>() {
+    System.out.<span class="fn">println</span>(<span class="str">"Thread running: "</span> + <span class="cls">Thread</span>.<span class="fn">currentThread</span>().<span class="fn">getName</span>());
+  }
+}
+<span class="kw">new</span> <span class="cls">MyThread</span>().<span class="fn">start</span>();
+
+<span class="cm">// Method 2: Implement Runnable (preferred)</span>
+<span class="cls">Thread</span> t = <span class="kw">new</span> <span class="cls">Thread</span>(() -&gt; System.out.<span class="fn">println</span>(<span class="str">"Lambda Thread"</span>));
+t.<span class="fn">start</span>();
+
+<span class="cm">// Synchronization</span>
+<span class="kw">synchronized void</span> <span class="fn">safeMethod</span>() {
+  <span class="cm">// Only one thread accesses this at a time</span>
+}</pre>
+      </div>
+
+      <hr class="divider">
+
+      <div class="doc-section" id="java-jjdbc">
+        <h1>🗄️ JDBC – Database Connectivity</h1>
+        <p>JDBC (Java Database Connectivity) allows Java programs to interact with databases like MySQL.</p>
+        <pre data-lang="Java">
+<span class="kw">import</span> java.sql.*;
+
+<span class="cls">Connection</span> con = <span class="cls">DriverManager</span>.<span class="fn">getConnection</span>(
+  <span class="str">"jdbc:mysql://localhost:3306/mydb"</span>, <span class="str">"root"</span>, <span class="str">"password"</span>
+);
+
+<span class="cls">Statement</span> stmt = con.<span class="fn">createStatement</span>();
+<span class="cls">ResultSet</span> rs = stmt.<span class="fn">executeQuery</span>(<span class="str">"SELECT * FROM students"</span>);
+
+<span class="kw">while</span> (rs.<span class="fn">next</span>()) {
+  System.out.<span class="fn">println</span>(rs.<span class="fn">getString</span>(<span class="str">"name"</span>));
+}
+con.<span class="fn">close</span>();</pre>
+
+        <div class="info-box orange"><strong>Steps:</strong> Load driver → Get connection → Create statement → Execute query → Process results → Close connection.</div>
+      </div>
+
+    </div><!-- end Java panel -->
+
+
+    <!-- ══════════════ WEB PANEL ══════════════ -->
+    <div class="course-panel" id="panel-web" data-course="web">
+
+      <div class="doc-section" id="web-wintro">
+        <h1>🌐 Introduction to Web Dev</h1>
+        <p>Web Development is the process of building websites and web applications. It involves three core technologies: <strong>HTML</strong> (structure), <strong>CSS</strong> (style), and <strong>JavaScript</strong> (behavior).</p>
+
+        <h2>How the Web Works</h2>
+        <pre data-lang="Diagram">
+User types URL in browser
+      ↓
+DNS resolves domain to IP
+      ↓
+Browser sends HTTP request to server
+      ↓
+Server returns HTML/CSS/JS files
+      ↓
+Browser renders the page</pre>
+
+        <h2>Frontend vs Backend</h2>
+        <table class="complexity-table">
+          <tr><th>Frontend</th><th>Backend</th></tr>
+          <tr><td>What user sees</td><td>Server-side logic</td></tr>
+          <tr><td>HTML, CSS, JS</td><td>Node.js, Python, Java</td></tr>
+          <tr><td>Runs in browser</td><td>Runs on server</td></tr>
+          <tr><td>UI, UX</td><td>Database, APIs</td></tr>
+        </table>
+      </div>
+
+      <hr class="divider">
+
+      <div class="doc-section" id="web-whtml">
+        <h1>🏗️ HTML Basics</h1>
+        <p>HTML (HyperText Markup Language) defines the structure of a webpage using <strong>elements</strong> and <strong>tags</strong>.</p>
+
+        <h2>Basic Structure</h2>
+        <pre data-lang="HTML">
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+  &lt;title&gt;My Page&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Hello World&lt;/h1&gt;
+  &lt;p&gt;This is a paragraph.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+
+        <h2>Common Tags</h2>
+        <table class="complexity-table">
+          <tr><th>Tag</th><th>Purpose</th></tr>
+          <tr><td>&lt;h1&gt;–&lt;h6&gt;</td><td>Headings</td></tr>
+          <tr><td>&lt;p&gt;</td><td>Paragraph</td></tr>
+          <tr><td>&lt;a href=""&gt;</td><td>Hyperlink</td></tr>
+          <tr><td>&lt;img src=""&gt;</td><td>Image</td></tr>
+          <tr><td>&lt;ul&gt;, &lt;ol&gt;, &lt;li&gt;</td><td>Lists</td></tr>
+          <tr><td>&lt;div&gt;</td><td>Generic block container</td></tr>
+          <tr><td>&lt;span&gt;</td><td>Inline container</td></tr>
+          <tr><td>&lt;table&gt;</td><td>Table structure</td></tr>
+        </table>
+
+        <h2>Semantic HTML</h2>
+        <pre data-lang="HTML">
+&lt;header&gt;...&lt;/header&gt;
+&lt;nav&gt;...&lt;/nav&gt;
+&lt;main&gt;...&lt;/main&gt;
+&lt;section&gt;...&lt;/section&gt;
+&lt;article&gt;...&lt;/article&gt;
+&lt;aside&gt;...&lt;/aside&gt;
+&lt;footer&gt;...&lt;/footer&gt;</pre>
+
+        <div class="info-box purple"><strong>Tip:</strong> Use semantic tags for better accessibility and SEO — they tell the browser and screen readers what the content means, not just how it looks.</div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="doc-section" id="web-wforms">
+        <h1>📝 HTML Forms</h1>
+        <pre data-lang="HTML">
+&lt;form action="/submit" method="POST"&gt;
+  &lt;label for="name"&gt;Name:&lt;/label&gt;
+  &lt;input type="text" id="name" name="name" placeholder="Your name"&gt;
+
+  &lt;label for="email"&gt;Email:&lt;/label&gt;
+  &lt;input type="email" id="email" name="email"&gt;
+
+  &lt;label for="msg"&gt;Message:&lt;/label&gt;
+  &lt;textarea id="msg" name="msg" rows="4"&gt;&lt;/textarea&gt;
+
+  &lt;select name="course"&gt;
+    &lt;option value="dsa"&gt;DSA&lt;/option&gt;
+    &lt;option value="java"&gt;Java&lt;/option&gt;
+  &lt;/select&gt;
+
+  &lt;button type="submit"&gt;Send&lt;/button&gt;
+&lt;/form&gt;</pre>
+
+        <h2>Input Types</h2>
+        <ul>
+          <li><code>text</code>, <code>email</code>, <code>password</code>, <code>number</code></li>
+          <li><code>checkbox</code>, <code>radio</code>, <code>range</code>, <code>date</code></li>
+          <li><code>file</code>, <code>color</code>, <code>hidden</code>, <code>submit</code></li>
+        </ul>
+      </div>
+
+      <hr class="divider">
+
+      <div class="doc-section" id="web-wcss">
+        <h1>🎨 CSS Basics</h1>
+        <p>CSS (Cascading Style Sheets) controls the visual appearance of HTML elements — colors, fonts, spacing, and layout.</p>
+
+        <h2>Selectors &amp; Properties</h2>
+        <pre data-lang="CSS">
+/* Element selector */
+p { color: gray; font-size: 16px; }
+
+/* Class selector */
+.card { background: white; border-radius: 8px; }
+
+/* ID selector */
+#hero { height: 100vh; }
+
+/* Pseudo-class */
+a:hover { color: blue; }
+
+/* Pseudo-element */
+p::first-line { font-weight: bold; }</pre>
+
+        <h2>Box Model</h2>
+        <p>Every HTML element is a box: content → padding → border → margin.</p>
+        <pre data-lang="CSS">
+.box {
+  width: 200px;
+  padding: 20px;
+  border: 2px solid black;
+  margin: 10px;
+  box-sizing: border-box; /* includes padding+border in width */
+}</pre>
+
+        <h2>CSS Variables</h2>
+        <pre data-lang="CSS">
+:root {
+  --primary: #3b82f6;
+  --bg: #ffffff;
+}
+
+button {
+  background: var(--primary);
+  color: var(--bg);
+}</pre>
+      </div>
+
+      <hr class="divider">
+
+      <div class="doc-section" id="web-wlayout">
+        <h1>📐 Flexbox &amp; Grid</h1>
+
+        <h2>Flexbox</h2>
+        <p>One-dimensional layout — row or column.</p>
+        <pre data-lang="CSS">
+.container {
+  display: flex;
+  justify-content: space-between; /* horizontal alignment */
+  align-items: center;            /* vertical alignment */
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.item {
+  flex: 1;        /* grow equally */
+  min-width: 200px;
+}</pre>
+
+        <h2>CSS Grid</h2>
+        <p>Two-dimensional layout — rows and columns simultaneously.</p>
+        <pre data-lang="CSS">
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto;
+  gap: 20px;
+}
+
+/* Span multiple columns */
+.featured {
+  grid-column: span 2;
+}</pre>
+
+        <div class="info-box purple"><strong>Rule of thumb:</strong> Use Flexbox for one-direction layouts (navbars, card rows). Use Grid for two-direction layouts (page layouts, dashboards).</div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="doc-section" id="web-wresponsive">
+        <h1>📱 Responsive Design</h1>
+        <p>Responsive design makes websites look good on all screen sizes using <strong>media queries</strong>.</p>
+
+        <pre data-lang="CSS">
+/* Default: Desktop */
+.container { width: 1100px; }
+
+/* Tablet */
+@media (max-width: 768px) {
+  .container { width: 100%; padding: 0 20px; }
+  .grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .grid { grid-template-columns: 1fr; }
+  nav { display: none; }
+  .mobile-menu { display: block; }
+}</pre>
+
+        <h2>Mobile-First Approach</h2>
+        <p>Write CSS for mobile first, then add media queries for larger screens using <code>min-width</code>.</p>
+        <pre data-lang="CSS">
+/* Mobile first */
+.grid { grid-template-columns: 1fr; }
+
+@media (min-width: 768px) {
+  .grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (min-width: 1024px) {
+  .grid { grid-template-columns: repeat(3, 1fr); }
+}</pre>
+      </div>
+
+      <hr class="divider">
+
+      <div class="doc-section" id="web-wjs">
+        <h1>⚡ JavaScript Basics</h1>
+
+        <h2>Variables &amp; Functions</h2>
+        <pre data-lang="JavaScript">
+<span class="kw">let</span> name = <span class="str">"Alice"</span>;     <span class="cm">// block-scoped</span>
+<span class="kw">const</span> PI = <span class="num">3.14</span>;       <span class="cm">// constant</span>
+<span class="kw">var</span> old = <span class="str">"avoid"</span>;     <span class="cm">// function-scoped (avoid)</span>
+
+<span class="cm">// Function declaration</span>
+<span class="kw">function</span> <span class="fn">greet</span>(name) {
+  <span class="kw">return</span> <span class="str">`Hello, ${name}!`</span>;
+}
+
+<span class="cm">// Arrow function</span>
+<span class="kw">const</span> add = (a, b) =&gt; a + b;
+
+<span class="cm">// Array methods</span>
+<span class="kw">const</span> nums = [<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">4</span>];
+nums.<span class="fn">map</span>(x =&gt; x * <span class="num">2</span>);      <span class="cm">// [2,4,6,8]</span>
+nums.<span class="fn">filter</span>(x =&gt; x &gt; <span class="num">2</span>);   <span class="cm">// [3,4]</span>
+nums.<span class="fn">reduce</span>((s,x) =&gt; s+x, <span class="num">0</span>); <span class="cm">// 10</span></pre>
+      </div>
+
+      <hr class="divider">
+
+      <div class="doc-section" id="web-wdom">
+        <h1>🌲 DOM Manipulation</h1>
+        <p>The DOM (Document Object Model) represents the HTML page as a tree. JavaScript can read and modify it dynamically.</p>
+
+        <pre data-lang="JavaScript">
+<span class="cm">// Selecting elements</span>
+<span class="kw">const</span> el = document.<span class="fn">getElementById</span>(<span class="str">"myId"</span>);
+<span class="kw">const</span> els = document.<span class="fn">querySelectorAll</span>(<span class="str">".card"</span>);
+
+<span class="cm">// Modifying content</span>
+el.textContent = <span class="str">"New text"</span>;
+el.innerHTML = <span class="str">"&lt;strong&gt;Bold&lt;/strong&gt;"</span>;
+
+<span class="cm">// Modifying styles</span>
+el.style.color = <span class="str">"red"</span>;
+el.classList.<span class="fn">add</span>(<span class="str">"active"</span>);
+el.classList.<span class="fn">toggle</span>(<span class="str">"hidden"</span>);
+
+<span class="cm">// Creating and appending elements</span>
+<span class="kw">const</span> div = document.<span class="fn">createElement</span>(<span class="str">"div"</span>);
+div.textContent = <span class="str">"New card"</span>;
+document.body.<span class="fn">appendChild</span>(div);</pre>
+      </div>
+
+      <hr class="divider">
+
+      <div class="doc-section" id="web-wevents">
+        <h1>🖱️ Events</h1>
+        <pre data-lang="JavaScript">
+<span class="cm">// Click event</span>
+document.<span class="fn">getElementById</span>(<span class="str">"btn"</span>)
+  .<span class="fn">addEventListener</span>(<span class="str">"click"</span>, () =&gt; {
+    <span class="fn">alert</span>(<span class="str">"Clicked!"</span>);
+  });
+
+<span class="cm">// Input event</span>
+document.<span class="fn">getElementById</span>(<span class="str">"search"</span>)
+  .<span class="fn">addEventListener</span>(<span class="str">"input"</span>, (e) =&gt; {
+    console.<span class="fn">log</span>(e.target.value);
+  });
+
+<span class="cm">// Keyboard event</span>
+document.<span class="fn">addEventListener</span>(<span class="str">"keydown"</span>, (e) =&gt; {
+  <span class="kw">if</span> (e.key === <span class="str">"Escape"</span>) <span class="fn">closeModal</span>();
+});
+
+<span class="cm">// Event delegation (efficient for many elements)</span>
+document.<span class="fn">getElementById</span>(<span class="str">"list"</span>)
+  .<span class="fn">addEventListener</span>(<span class="str">"click"</span>, (e) =&gt; {
+    <span class="kw">if</span> (e.target.tagName === <span class="str">"LI"</span>) {
+      e.target.classList.<span class="fn">toggle</span>(<span class="str">"done"</span>);
+    }
+  });</pre>
+      </div>
+
+      <hr class="divider">
+
+      <div class="doc-section" id="web-wfetch">
+        <h1>🔌 Fetch API &amp; Async JS</h1>
+        <p>The Fetch API lets you make HTTP requests from JavaScript to get data from servers.</p>
+
+        <h2>Promises &amp; Async/Await</h2>
+        <pre data-lang="JavaScript">
+<span class="cm">// Fetch with async/await</span>
+<span class="kw">async function</span> <span class="fn">getData</span>() {
+  <span class="kw">try</span> {
+    <span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">"https://api.example.com/data"</span>);
+    <span class="kw">const</span> json = <span class="kw">await</span> res.<span class="fn">json</span>();
+    console.<span class="fn">log</span>(json);
+  } <span class="kw">catch</span> (err) {
+    console.<span class="fn">error</span>(<span class="str">"Error:"</span>, err);
+  }
+}
+
+<span class="cm">// POST request</span>
+<span class="kw">async function</span> <span class="fn">postData</span>(url, data) {
+  <span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(url, {
+    method: <span class="str">"POST"</span>,
+    headers: { <span class="str">"Content-Type"</span>: <span class="str">"application/json"</span> },
+    body: JSON.<span class="fn">stringify</span>(data)
+  });
+  <span class="kw">return</span> res.<span class="fn">json</span>();
+}</pre>
+
+        <div class="info-box purple"><strong>Key Concepts:</strong> Promises represent future values. <code>async/await</code> is syntax sugar over Promises that makes asynchronous code look synchronous and easier to read.</div>
+      </div>
+
+    </div><!-- end Web panel -->
+
+  </main>
+</div>
+
+<script>
+  function switchCourse(course) {
+    // Hide all panels
+    document.querySelectorAll('.course-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.sidebar-nav').forEach(n => n.style.display = 'none');
+    document.querySelectorAll('.sidebar-title').forEach(t => t.classList.remove('active'));
+
+    // Show selected
+    document.getElementById('panel-' + course).classList.add('active');
+    document.getElementById('nav-' + course).style.display = 'block';
+    document.getElementById('sidebar-title-' + course).classList.add('active');
+
+    // Update tab buttons
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('[data-course="' + course + '"]').classList.add('active');
+
+    // Scroll to top
+    window.scrollTo(0, 0);
+  }
+
+  function scrollTo(course, sectionId) {
+    const el = document.getElementById(course + '-' + sectionId);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+      // highlight active sidebar link
+      const nav = document.getElementById('nav-' + course);
+      nav.querySelectorAll('a').forEach(a => a.classList.remove('current'));
+      const links = nav.querySelectorAll('a');
+      links.forEach(a => {
+        if (a.getAttribute('onclick') && a.getAttribute('onclick').includes("'" + sectionId + "'")) {
+          a.classList.add('current');
+        }
+      });
+    }
+    // close mobile sidebar
+    document.getElementById('sidebar').classList.remove('open');
+  }
+
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+  }
+
+  // Auto-load from URL param (links from index.html)
+  const params = new URLSearchParams(window.location.search);
+  const selected = params.get('course') || 'dsa';
+  switchCourse(selected);
+
+  // Scroll spy – highlight sidebar link as user scrolls
+  window.addEventListener('scroll', () => {
+    const course = document.querySelector('.course-panel.active').dataset.course;
+    const nav = document.getElementById('nav-' + course);
+    const sections = document.querySelectorAll('#panel-' + course + ' .doc-section');
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY + 120 >= s.offsetTop) current = s.id;
+    });
+    nav.querySelectorAll('a').forEach(a => {
+      const onclick = a.getAttribute('onclick') || '';
+      a.classList.remove('current');
+      if (current && onclick.includes("'" + current.split('-')[1] + "'")) {
+        a.classList.add('current');
+      }
+    });
+  });
+</script>
+</body>
+</html>

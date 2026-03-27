@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSA Documentation</title>
+<link rel="stylesheet" href="dsa.css">
+</head>
+
+<body>
+
+<header class="topbar">
+    <h2>📘 LearnStack - DSA</h2>
+    <a href="../index.html">⬅ Home</a>
+</header>
+
+<div class="layout">
+
+```
+<!-- LEFT SIDEBAR -->
+<aside class="sidebar">
+    <h3>DSA Topics</h3>
+    <ul>
+        <li><a href="#intro">Introduction</a></li>
+        <li><a href="#array">Arrays</a></li>
+        <li><a href="#string">Strings</a></li>
+        <li><a href="#linkedlist">Linked List</a></li>
+        <li><a href="#stack">Stack</a></li>
+        <li><a href="#queue">Queue</a></li>
+        <li><a href="#recursion">Recursion</a></li>
+        <li><a href="#search">Searching</a></li>
+        <li><a href="#sorting">Sorting</a></li>
+        <li><a href="#tree">Trees</a></li>
+        <li><a href="#graph">Graphs</a></li>
+        <li><a href="#dp">Dynamic Programming</a></li>
+    </ul>
+</aside>
+
+<!-- RIGHT CONTENT -->
+<main class="content">
+
+    <section id="intro">
+        <h1>Introduction to DSA</h1>
+        <p>
+            Data Structures and Algorithms (DSA) are fundamental concepts in computer science.
+            They help in organizing data efficiently and solving problems in optimal ways.
+        </p>
+        <p>
+            Mastering DSA is essential for cracking technical interviews and building efficient applications.
+        </p>
+    </section>
+
+    <section id="array">
+        <h1>Arrays</h1>
+        <p>
+            Arrays store elements in contiguous memory locations. They allow fast access using index.
+        </p>
+
+        <h3>Key Operations</h3>
+        <ul>
+            <li>Access → O(1)</li>
+            <li>Insertion → O(n)</li>
+            <li>Deletion → O(n)</li>
+        </ul>
+
+        <pre>
+```
+
+let arr = [10,20,30,40];
+console.log(arr[2]); // 30 </pre>
+
+```
+        <p>
+            Arrays are widely used in problems involving indexing, sliding window, and prefix sums.
+        </p>
+    </section>
+
+    <section id="string">
+        <h1>Strings</h1>
+        <p>
+            Strings are sequences of characters. They are widely used in pattern matching problems.
+        </p>
+
+        <pre>
+```
+
+let str = "hello";
+console.log(str.length); </pre> </section>
+
+```
+    <section id="linkedlist">
+        <h1>Linked List</h1>
+        <p>
+            A linked list is a collection of nodes where each node points to the next node.
+        </p>
+
+        <pre>
+```
+
+class Node {
+constructor(data){
+this.data = data;
+this.next = null;
+}
+} </pre>
+
+```
+        <p>
+            Types: Singly, Doubly, Circular Linked List
+        </p>
+    </section>
+
+    <section id="stack">
+        <h1>Stack</h1>
+        <p>
+            Stack follows LIFO (Last In First Out).
+        </p>
+
+        <pre>
+```
+
+let stack = [];
+stack.push(10);
+stack.pop(); </pre> </section>
+
+```
+    <section id="queue">
+        <h1>Queue</h1>
+        <p>
+            Queue follows FIFO (First In First Out).
+        </p>
+
+        <pre>
+```
+
+let queue = [];
+queue.push(10);
+queue.shift(); </pre> </section>
+
+```
+    <section id="recursion">
+        <h1>Recursion</h1>
+        <p>
+            Recursion is a function calling itself to solve smaller subproblems.
+        </p>
+
+        <pre>
+```
+
+function fact(n){
+if(n==0) return 1;
+return n * fact(n-1);
+} </pre> </section>
+
+```
+    <section id="search">
+        <h1>Searching</h1>
+
+        <h3>Binary Search</h3>
+        <p>
+            Works on sorted arrays with O(log n) complexity.
+        </p>
+
+        <pre>
+```
+
+function binarySearch(arr,target){
+let l=0,r=arr.length-1;
+while(l<=r){
+let mid=Math.floor((l+r)/2);
+if(arr[mid]==target) return mid;
+else if(arr[mid]<target) l=mid+1;
+else r=mid-1;
+}
+return -1;
+} </pre> </section>
+
+```
+    <section id="sorting">
+        <h1>Sorting Algorithms</h1>
+
+        <h3>Bubble Sort</h3>
+        <pre>
+```
+
+function bubbleSort(arr){
+for(let i=0;i<arr.length;i++){
+for(let j=0;j<arr.length-i-1;j++){
+if(arr[j]>arr[j+1]){
+[arr[j],arr[j+1]]=[arr[j+1],arr[j]];
+}
+}
+}
+return arr;
+} </pre> </section>
+
+```
+    <section id="tree">
+        <h1>Trees</h1>
+        <p>
+            Trees are hierarchical structures with a root node.
+        </p>
+
+        <pre>
+```
+
+class TreeNode {
+constructor(val){
+this.val = val;
+this.left = null;
+this.right = null;
+}
+} </pre> </section>
+
+```
+    <section id="graph">
+        <h1>Graphs</h1>
+        <p>
+            Graphs consist of nodes and edges. Used in networking, maps, etc.
+        </p>
+
+        <pre>
+```
+
+let graph = {
+A: ["B","C"],
+B: ["A","D"],
+C: ["A"],
+D: ["B"]
+}; </pre> </section>
+
+```
+    <section id="dp">
+        <h1>Dynamic Programming</h1>
+        <p>
+            DP solves problems by storing results of subproblems.
+        </p>
+
+        <pre>
+```
+
+function fib(n){
+let dp=[0,1];
+for(let i=2;i<=n;i++){
+dp[i]=dp[i-1]+dp[i-2];
+}
+return dp[n];
+} </pre> </section>
+
+```
+</main>
+```
+
+</div>
+
+</body>
+</html>
